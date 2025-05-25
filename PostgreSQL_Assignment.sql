@@ -111,5 +111,60 @@ SELECT * FROM sightings
 WHERE location LIKE '%Pass%';
 
 -- Problem - 4
+SELECT r.name, COUNT(s.sighting_id) AS total_sightings
+FROM rangers r
+LEFT JOIN sightings s ON r.ranger_id = s.ranger_id
+GROUP BY r.name;
+
+-- Problem - 5
+SELECT sp.common_name
+FROM species sp
+LEFT JOIN sightings s ON sp.species_id = s.species_id
+WHERE s.sighting_id IS NULL;
+
+-- Problem - 6
+SELECT sp.common_name, s.sighting_time, r.name
+FROM sightings s
+INNER JOIN species sp ON s.species_id = sp.species_id
+INNER JOIN rangers r ON s.ranger_id = r.ranger_id
+ORDER BY s.sighting_time DESC LIMIT 2;
 
 
+-- Problem - 7
+
+ALTER TABLE species
+DROP CONSTRAINT species_conservation_status_check;
+
+ALTER TABLE species
+ADD CONSTRAINT species_conservation_status_check 
+CHECK (conservation_status IN ('Threatened', 'Vulnerable', 'Endangered', 'Historic'));
+
+
+UPDATE species
+SET conservation_status = 'Historic'
+WHERE discovery_date < '1800-01-01';
+
+-- Problem - 8
+
+CREATE TABLE time_ranges (
+  start_hour INT,
+  end_hour INT,
+  time_of_day TEXT
+);
+
+INSERT INTO time_ranges VALUES
+  (0, 11, 'Morning'),
+  (12, 17, 'Afternoon'),
+  (18, 23, 'Evening');
+
+
+SELECT s.sighting_id, tr.time_of_day FROM sightings s
+JOIN time_ranges tr ON EXTRACT(HOUR FROM s.sighting_time) BETWEEN tr.start_hour AND tr.end_hour;
+
+
+-- Problem - 9
+DELETE FROM rangers
+WHERE ranger_id NOT IN (
+  SELECT ranger_id FROM sightings
+  GROUP BY ranger_id
+);
