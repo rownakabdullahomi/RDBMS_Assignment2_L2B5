@@ -92,3 +92,24 @@ INSERT INTO sightings (species_id, ranger_id, location, sighting_time, notes) VA
 SELECT * FROM rangers;
 SELECT * FROM species;
 SELECT * FROM sightings;
+
+-- Problem - 1
+INSERT INTO rangers ("name", region) 
+VALUES ('Derek Fox', 'Coastal Plains');
+
+-- Problem - 2
+SELECT COUNT(*) AS unique_species_count
+FROM (
+  SELECT species_id
+  FROM sightings
+  GROUP BY species_id
+);
+
+
+-- Problem - 3
+SELECT * FROM sightings
+WHERE location LIKE '%Pass%';
+
+-- Problem - 4
+
+
