@@ -93,11 +93,20 @@ SELECT * FROM rangers;
 SELECT * FROM species;
 SELECT * FROM sightings;
 
+DROP Table rangers;
+DROP Table species;
+DROP Table sightings;
+
 -- Problem - 1
+-- 1️⃣ Register a new ranger with provided data with name = 'Derek Fox' and region = 'Coastal Plains'
+
 INSERT INTO rangers ("name", region) 
 VALUES ('Derek Fox', 'Coastal Plains');
 
+
 -- Problem - 2
+-- 2️⃣ Count unique species ever sighted.
+
 SELECT COUNT(*) AS unique_species_count
 FROM (
   SELECT species_id
@@ -107,22 +116,34 @@ FROM (
 
 
 -- Problem - 3
+-- 3️⃣ Find all sightings where the location includes "Pass".
+
 SELECT * FROM sightings
 WHERE location LIKE '%Pass%';
 
+
 -- Problem - 4
+-- 4️⃣ List each ranger's name and their total number of sightings.
+
 SELECT r.name, COUNT(s.sighting_id) AS total_sightings
 FROM rangers r
 LEFT JOIN sightings s ON r.ranger_id = s.ranger_id
 GROUP BY r.name;
 
+
 -- Problem - 5
+-- 5️⃣ List species that have never been sighted.
+
 SELECT sp.common_name
 FROM species sp
 LEFT JOIN sightings s ON sp.species_id = s.species_id
 WHERE s.sighting_id IS NULL;
 
+
+
 -- Problem - 6
+-- 6️⃣ Show the most recent 2 sightings.
+
 SELECT sp.common_name, s.sighting_time, r.name
 FROM sightings s
 INNER JOIN species sp ON s.species_id = sp.species_id
@@ -131,6 +152,7 @@ ORDER BY s.sighting_time DESC LIMIT 2;
 
 
 -- Problem - 7
+-- 7️⃣ Update all species discovered before year 1800 to have status 'Historic'.
 
 ALTER TABLE species
 DROP CONSTRAINT species_conservation_status_check;
@@ -144,7 +166,9 @@ UPDATE species
 SET conservation_status = 'Historic'
 WHERE discovery_date < '1800-01-01';
 
+
 -- Problem - 8
+-- 8️⃣ Label each sighting's time of day as 'Morning', 'Afternoon', or 'Evening'.
 
 CREATE TABLE time_ranges (
   start_hour INT,
@@ -163,8 +187,12 @@ JOIN time_ranges tr ON EXTRACT(HOUR FROM s.sighting_time) BETWEEN tr.start_hour 
 
 
 -- Problem - 9
+-- 9️⃣ Delete rangers who have never sighted any species
+
 DELETE FROM rangers
-WHERE ranger_id NOT IN (
-  SELECT ranger_id FROM sightings
-  GROUP BY ranger_id
+WHERE ranger_id IN (
+  SELECT r.ranger_id FROM rangers r
+  LEFT JOIN sightings s ON r.ranger_id = s.ranger_id
+  WHERE s.ranger_id IS NULL
 );
+
